@@ -1,0 +1,25 @@
+{
+  "name": "TimeLog",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.61.0",
+    "@typescript-eslint/eslint-plugin": "^8.62.0",
+    "@typescript-eslint/parser": "^8.62.0",
+    "@types/node": "^26.0.0",
+    "allure-commandline": "2.43.0",
+    "allure-playwright": "^3.10.0",
+    "eslint": "^9.39.4",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  },
+  "scripts": {
+    "test": "npx playwright test --headed",
+    "test-ui": "npx playwright test --ui",
+    "eslint": "./node_modules/.bin/eslint . --ext .ts",
+    "generate-report": "allure generate ./allure-results -o ./reports/allure-report --clean"
+  }
+}

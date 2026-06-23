@@ -1,0 +1,66 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Install Java runtime for Allure
+        run: sudo apt-get update && sudo apt-get install -y default-jre
+
+      - name: Copy environment file
+        run: cp .env.example .env
+
+      - name: Run Playwright tests
+        run: npx playwright test
+        env:
+          BASE_URL: https://www.saucedemo.com
+          STANDARD_USER: standard_user
+          PASSWORD: secret_sauce
+
+      - name: Generate Allure report
+        run: npm run generate-report
+
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-node-${{ matrix.node-version }}
+          path: ./reports/html-report/
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Upload Allure Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-report-node-${{ matrix.node-version }}
+          path: ./reports/allure-report/
+          retention-days: 30
+          if-no-files-found: ignore
